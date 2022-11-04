@@ -10,7 +10,7 @@ public class StartGame : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Invoke("ActiveEnemyCreators", TimeToActiveEnemyCreators);
+        Invoke(nameof(ActiveEnemyCreators), TimeToActiveEnemyCreators);
     }
 
     void ActiveEnemyCreators()
