@@ -19,14 +19,16 @@ public class BuildingPlacer : MonoBehaviour
     {
         _plane = new Plane(Vector3.up, Vector3.zero);
 
-        if (Management.AllBuildings.Count > 0)
-            foreach (Building building in Management.AllBuildings)
-            {
-                int x = Mathf.RoundToInt(building.transform.position.x);
-                int z = Mathf.RoundToInt(building.transform.position.z);
+        Management.InstallCreatedBuilding(this);
 
-                InstallBuilding(x, z, building);
-            }
+        //if (Management.AllBuildings.Count > 0)
+        //    foreach (Building building in Management.AllBuildings)
+        //    {
+        //        int x = Mathf.RoundToInt(building.transform.position.x);
+        //        int z = Mathf.RoundToInt(building.transform.position.z);
+
+        //        InstallBuilding(x, z, building);
+        //    }
     }
 
     void Update()
@@ -102,7 +104,7 @@ public class BuildingPlacer : MonoBehaviour
         return true;
     }
 
-    void InstallBuilding(int xPosition, int zPosition, Building building)
+    public void InstallBuilding(int xPosition, int zPosition, Building building)
     {
         for (int x = 0; x < building.XSize; x++)
         {

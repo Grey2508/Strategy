@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static UnityEngine.UI.CanvasScaler;
 
 public enum SelectionState
 {
@@ -14,9 +16,9 @@ public enum SelectionState
 
 public class Management : MonoBehaviour
 {
-    public static List<Enemy> AllEnemies = new List<Enemy>();
-    public static List<Unit> AllUnits = new List<Unit>();
-    public static List<Building> AllBuildings = new List<Building>();
+    private static List<Enemy> AllEnemies = new List<Enemy>();
+    private static List<Unit> AllUnits = new List<Unit>();
+    private static List<Building> AllBuildings = new List<Building>();
     public static SelectionState CurrentSelectionState = SelectionState.Other;
     public static bool IsOnMenu = false;
 
@@ -28,7 +30,7 @@ public class Management : MonoBehaviour
     public Image FrameImage;
     private Vector2 _frameStart;
     private Vector2 _frameEnd;
-
+    private bool _isFrameActive;
 
     void Update()
     {
@@ -40,8 +42,8 @@ public class Management : MonoBehaviour
 
         ClickOnGround(hit);
 
-        if (Input.GetMouseButtonDown(1))
-            UnselectAll();
+        //if (Input.GetMouseButtonDown(1))
+        //    UnselectAll();
 
         FrameSelect();
 
@@ -82,7 +84,15 @@ public class Management : MonoBehaviour
         if (CurrentSelectionState != SelectionState.UnitsSelected)
             return;
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && !EventSystem.current.IsPointerOverGameObject())
+        {
+            if (!hit.collider || !hit.collider.CompareTag("Ground"))
+                return;
+
+            UnselectAll();
+        }
+
+        if (Input.GetMouseButtonUp(1))
         {
             if (!hit.collider || !hit.collider.CompareTag("Ground"))
                 return;
@@ -123,12 +133,13 @@ public class Management : MonoBehaviour
 
     private void FrameSelect()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
             _frameStart = Input.mousePosition;
+            _isFrameActive = true;
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && _isFrameActive)
         {
             _frameEnd = Input.mousePosition;
 
@@ -164,7 +175,7 @@ public class Management : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
-            FrameImage.enabled = false;
+            FrameImage.enabled = _isFrameActive = false;
 
             CurrentSelectionState = (ListOfSelected.Count > 0 ? SelectionState.UnitsSelected : SelectionState.Other);
         }
@@ -205,5 +216,123 @@ public class Management : MonoBehaviour
 
         ListOfSelected.Clear();
         CurrentSelectionState = SelectionState.Other;
+    }
+
+    public static void AddEnemy(Enemy newEnemy)
+    {
+        AllEnemies.Add(newEnemy);
+    }
+    public static void RemoveEnemy(Enemy enemy)
+    {
+        AllEnemies.Remove(enemy);
+    }
+
+    public static void AddUnit(Unit newUnit)
+    {
+        AllUnits.Add(newUnit);
+    }
+    public static void RemoveUnit(Unit unit)
+    {
+        AllUnits.Remove(unit);
+    }
+
+    public static void AddBuilding(Building newBuilding)
+    {
+        AllBuildings.Add(newBuilding);
+    }
+    public static void RemoveBuilding(Building building)
+    {
+        AllBuildings.Remove(building);
+
+        if (AllBuildings.Count == 0)
+            GameOver();
+    }
+
+    private static void GameOver()
+    {
+        Debug.Log("gameOver");
+    }
+
+    public static T GetClosestBuilding<T>(Vector3 position, out float Distance) where T : Building
+    {
+        float minDistance = float.MaxValue;
+        T closestBuilding = null;
+
+        foreach (Building building in AllBuildings)
+        {
+            if (!(building is T))
+                continue;
+
+            if (building.CurrentState == BuildingState.Placed)
+                continue;
+
+            float distance = Vector3.Distance(position, building.transform.position);
+
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestBuilding = (T)building;
+            }
+        }
+
+        Distance = minDistance;
+        return closestBuilding;
+    }
+
+    public static T GetClosestUnit<T>(Vector3 position, out float Distance) where T : Unit
+    {
+        float minDistance = float.MaxValue;
+        T closestUnit = null;
+
+        foreach (Unit unit in AllUnits)
+        {
+            if (!(unit is T))
+                continue;
+
+            float distance = Vector3.Distance(position, unit.transform.position);
+
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestUnit = (T)unit;
+            }
+        }
+
+        Distance = minDistance;
+        return closestUnit;
+    }
+
+    public static Enemy GetClosestEnemy(Vector3 position, out float Distance)
+    {
+        float minDistance = Distance = float.MaxValue;
+        Enemy closestEnemy = null;
+
+        foreach (Enemy enemy in AllEnemies)
+        {
+            float distance = Vector3.Distance(position, enemy.transform.position);
+
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestEnemy = enemy;
+            }
+        }
+
+        Distance = minDistance;
+        return closestEnemy;
+    }
+
+    public static void InstallCreatedBuilding(BuildingPlacer buildingPlacer)
+    {
+        if (AllBuildings.Count == 0)
+            return;
+
+        foreach (Building building in AllBuildings)
+        {
+            int x = Mathf.RoundToInt(building.transform.position.x);
+            int z = Mathf.RoundToInt(building.transform.position.z);
+
+            buildingPlacer.InstallBuilding(x, z, building);
+        }
     }
 }

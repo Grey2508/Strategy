@@ -38,7 +38,7 @@ public class Enemy : MonoBehaviour
 
     private void Start()
     {
-        Management.AllEnemies.Add(this);
+        Management.AddEnemy(this);
 
         GameObject healthBarPrefab = Instantiate(HealthBarPrefab);
         _healthBar = healthBarPrefab.GetComponent<HealthBar>();
@@ -201,22 +201,22 @@ public class Enemy : MonoBehaviour
     {
         //Building[] allBuildings = FindObjectsOfType<Building>();
 
-        float minDistance = Mathf.Infinity;
-        Building closestBuilding = null;
+        //float minDistance = Mathf.Infinity;
+        Building closestBuilding = Management.GetClosestBuilding<Building>(transform.position, out float minDistance);
 
-        foreach (Building building in Management.AllBuildings)
-        {
-            if (building.CurrentState == BuildingState.Placed)
-                continue;
+        //foreach (Building building in Management.AllBuildings)
+        //{
+        //    if (building.CurrentState == BuildingState.Placed)
+        //        continue;
 
-            float distance = Vector3.Distance(transform.position, building.transform.position);
+        //    float distance = Vector3.Distance(transform.position, building.transform.position);
 
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closestBuilding = building;
-            }
-        }
+        //    if (distance < minDistance)
+        //    {
+        //        minDistance = distance;
+        //        closestBuilding = building;
+        //    }
+        //}
 
         TargetBuilding = closestBuilding;
     }
@@ -225,19 +225,19 @@ public class Enemy : MonoBehaviour
     {
         //Unit[] allUnits = FindObjectsOfType<Unit>();
 
-        float minDistance = Mathf.Infinity;
-        Unit closestUnit = null;
+        //float minDistance = Mathf.Infinity;
+        Unit closestUnit = Management.GetClosestUnit<Unit>(transform.position, out float minDistance);
 
-        foreach (Unit unit in Management.AllUnits)
-        {
-            float distance = Vector3.Distance(transform.position, unit.transform.position);
+        //foreach (Unit unit in Management.AllUnits)
+        //{
+        //    float distance = Vector3.Distance(transform.position, unit.transform.position);
 
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closestUnit = unit;
-            }
-        }
+        //    if (distance < minDistance)
+        //    {
+        //        minDistance = distance;
+        //        closestUnit = unit;
+        //    }
+        //}
 
         if (minDistance < FollowRange)
         {
@@ -248,7 +248,7 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damageValue)
     {
-        FindClosestUnit();
+        //FindClosestUnit();
 
         Health -= damageValue;
         _healthBar.SetHealth(Health, _maxHealth);
@@ -264,7 +264,7 @@ public class Enemy : MonoBehaviour
         if (_healthBar)
             Destroy(_healthBar.gameObject);
 
-        Management.AllEnemies.Remove(this);
+        Management.RemoveEnemy(this);
     }
 
 #if UNITY_EDITOR

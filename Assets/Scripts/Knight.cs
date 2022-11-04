@@ -128,19 +128,19 @@ public class Knight : Unit
     {
         //Enemy[] allEnemies = FindObjectsOfType<Enemy>();
 
-        float minDistance = Mathf.Infinity;
-        Enemy closestEnemy = null;
+        //float minDistance = Mathf.Infinity;
+        Enemy closestEnemy = Management.GetClosestEnemy(transform.position, out float minDistance);
 
-        foreach (Enemy enemy in Management.AllEnemies)
-        {
-            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+        //foreach (Enemy enemy in Management.AllEnemies)
+        //{
+        //    float distance = Vector3.Distance(transform.position, enemy.transform.position);
 
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closestEnemy = enemy;
-            }
-        }
+        //    if (distance < minDistance)
+        //    {
+        //        minDistance = distance;
+        //        closestEnemy = enemy;
+        //    }
+        //}
 
         if (minDistance < FollowRange)
         {

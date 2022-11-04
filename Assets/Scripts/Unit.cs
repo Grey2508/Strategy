@@ -31,7 +31,7 @@ public class Unit : SelectableObject
 
         TargetPointer.SetActive(false);
 
-        Management.AllUnits.Add(this);
+        Management.AddUnit(this);
     }
     public override void WhenClickOnGround(Vector3 point)
     {
@@ -66,7 +66,7 @@ public class Unit : SelectableObject
         if (TargetPointer)
             Destroy(TargetPointer);
 
-        Management.AllUnits.Remove(this);
+        Management.RemoveUnit(this);
     }
 
     public override void Select()

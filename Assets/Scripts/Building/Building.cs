@@ -37,7 +37,7 @@ public class Building : SelectableObject
         base.Start();
         MenuObject.SetActive(false);
 
-        Management.AllBuildings.Add(this);
+        Management.AddBuilding(this);
     }
 
     private void Awake()
@@ -117,6 +117,6 @@ public class Building : SelectableObject
 
         BuildingPlacer.RemoveBuilding(this);
 
-        Management.AllBuildings.Remove(this);
+        Management.RemoveBuilding(this);
     }
 }
