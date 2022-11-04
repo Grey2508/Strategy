@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Mine : Building
 {
-    public GameObject MiningIndicator;
-    
+    public GameObject[] MiningIndicators;
+
     public bool IsMined;
 
     public int GoldPerTime = 1;
@@ -20,13 +20,14 @@ public class Mine : Building
     {
         base.Start();
 
-        MiningIndicator.SetActive(false);
+        for (int i = 0; i < MiningIndicators.Length; i++)
+            MiningIndicators[i].SetActive(false);
     }
-    
-    public void ToggleIndicator(bool stage)
-    {
-        MiningIndicator.SetActive(stage);
-    }
+
+    //public void ToggleIndicator(bool stage)
+    //{
+    //    MiningIndicator.SetActive(stage);
+    //}
 
     public void IncCountMiners()
     {
@@ -35,22 +36,26 @@ public class Mine : Building
 
         if (_countMiners > MaxMiners)
             _countMiners = MaxMiners;
+
+        MiningIndicators[_countMiners - 1].SetActive(true);
     }
     public void DecCountMiners()
     {
-        if(--_countMiners<=0)
+        if (--_countMiners <= 0)
         {
             _countMiners = 0;
-            
-            ToggleIndicator(false);
+
+            //ToggleIndicator(false);
 
             StopCoroutine("Mining");
         }
+
+        MiningIndicators[_countMiners - 1].SetActive(false);
     }
 
     IEnumerator Mining()
     {
-        ToggleIndicator(true);
+        //ToggleIndicator(true);
 
         for (; ; )
         {
