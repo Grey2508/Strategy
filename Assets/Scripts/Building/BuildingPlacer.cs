@@ -19,6 +19,8 @@ public class BuildingPlacer : MonoBehaviour
     {
         _plane = new Plane(Vector3.up, Vector3.zero);
 
+        BuildingDictionary.Clear();
+
         Management.InstallCreatedBuilding(this);
 
         //if (Management.AllBuildings.Count > 0)
