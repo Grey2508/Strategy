@@ -1,11 +1,19 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+public enum MinerState
+{
+    Idle,
+    WalkToPoint,
+    Mining,
+    Escape
+}
+
 public class Miner : Unit
 {
+    [Header("Miner")]
+    public MinerState CurrentState;
+
     public float FearRange = 6;
     public float MiningRange = 1;
     public float SeeMineRange = 8;
@@ -15,29 +23,30 @@ public class Miner : Unit
     private Enemy _scaredEnemy;
     private Knight _knight;
 
-    public override void Start()
+    protected override void Prepaire()
     {
-        base.Start();
+        base.Prepaire();
 
-        SetState(UnitState.Idle);
+        SetState(MinerState.Idle);
     }
+
     void Update()
     {
-        if (CurrentUnitState != UnitState.Escape)
+        if (CurrentState != MinerState.Escape)
             FindClosestEnemy();
 
-        switch (CurrentUnitState)
+        switch (CurrentState)
         {
-            case UnitState.Idle:
+            case MinerState.Idle:
                 MinerIdle();
-                    break;
-            case UnitState.WalkToPoint:
+                break;
+            case MinerState.WalkToPoint:
                 MinerWalkToPoint();
-                    break;
-            case UnitState.Mining:
+                break;
+            case MinerState.Mining:
                 MinerMining();
-                    break;
-            case UnitState.Escape:
+                break;
+            case MinerState.Escape:
                 MinerEscape();
                 break;
         }
@@ -55,10 +64,10 @@ public class Miner : Unit
             if (Vector3.Distance(transform.position, TargetPoint) >= 0.5f)
             {
                 NavMeshAgent.SetDestination(TargetPointer.transform.position);
-                SetState(UnitState.WalkToPoint);
+                SetState(MinerState.WalkToPoint);
             }
             else
-                SetState(UnitState.Idle);
+                SetState(MinerState.Idle);
         }
         else
         {
@@ -67,8 +76,7 @@ public class Miner : Unit
 
             if (distance < MiningRange)
             {
-                //_targetMine.ToggleIndicator(true);
-                SetState(UnitState.Mining);
+                SetState(MinerState.Mining);
             }
         }
     }
@@ -80,12 +88,11 @@ public class Miner : Unit
     private void MinerEscape()
     {
         if (!FindClosestEnemy())
-            SetState(UnitState.WalkToPoint);
+            SetState(MinerState.WalkToPoint);
 
         if (FindClosestKnight())
         {
-            if (_knight.CurrentUnitState != UnitState.WalkToEnemy && _knight.CurrentUnitState != UnitState.Attack)
-                NavMeshAgent.SetDestination(_knight.transform.position);
+            NavMeshAgent.SetDestination(_knight.transform.position);
         }
         else
         {
@@ -97,25 +104,25 @@ public class Miner : Unit
 
     }
 
-    public void SetState(UnitState newState)
+    public void SetState(MinerState newState)
     {
-        CurrentUnitState = newState;
+        CurrentState = newState;
 
-        switch (CurrentUnitState)
+        switch (CurrentState)
         {
-            case UnitState.Idle:
+            case MinerState.Idle:
                 TargetPointer.SetActive(false);
                 break;
-            case UnitState.WalkToPoint:
+            case MinerState.WalkToPoint:
                 break;
-            case UnitState.Mining:
+            case MinerState.Mining:
                 {
                     TargetPointer.SetActive(false);
                     _targetMine.IncCountMiners();
 
                     break;
                 }
-            case UnitState.Escape:
+            case MinerState.Escape:
                 {
                     TargetPointer.SetActive(false);
                     LoseMine();
@@ -125,52 +132,29 @@ public class Miner : Unit
         }
     }
 
+    protected override void SetState(int newState)
+    {
+        SetState((MinerState)newState);
+    }
+
     public bool FindClosestEnemy()
     {
-        //Enemy[] allEnemies = FindObjectsOfType<Enemy>();
-
-        //float minDistance = Mathf.Infinity;
         Enemy closestEnemy = Management.GetClosestEnemy(transform.position, out float minDistance);
-
-        //foreach (Enemy enemy in Management.AllEnemies)
-        //{
-        //    float distance = Vector3.Distance(transform.position, enemy.transform.position);
-
-        //    if (distance < minDistance)
-        //    {
-        //        minDistance = distance;
-        //        closestEnemy = enemy;
-        //    }
-        //}
 
         if (minDistance < FearRange)
         {
             _scaredEnemy = closestEnemy;
-            SetState(UnitState.Escape);
+            SetState(MinerState.Escape);
 
             return true;
         }
 
         return false;
     }
+
     public bool FindClosestKnight()
     {
-        //float minDistance = Mathf.Infinity;
         Knight closestKnight = Management.GetClosestUnit<Knight>(transform.position, out float minDistance);
-
-        //foreach (Unit knight in Management.AllUnits)
-        //{
-        //    if (!(knight is Knight))
-        //        continue;
-
-        //    float distance = Vector3.Distance(transform.position, knight.transform.position);
-
-        //    if (distance < minDistance)
-        //    {
-        //        minDistance = distance;
-        //        closestKnight = (Knight)knight;
-        //    }
-        //}
 
         if (closestKnight)
         {
@@ -184,33 +168,13 @@ public class Miner : Unit
 
     public void FindClosestMine()
     {
-        //Mine[] allMines = FindObjectsOfType<Mine>();
-
-        //float minDistance = Mathf.Infinity;
         Mine closestMine = Management.GetClosestBuilding<Mine>(transform.position, out float minDistance);
-
-        //foreach (Building mine in Management.AllBuildings)
-        //{
-        //    if (!(mine is Mine))
-        //        continue;
-
-        //    if (mine.CurrentState == BuildingState.Placed)
-        //        continue;
-
-        //    float distance = Vector3.Distance(transform.position, mine.transform.position);
-
-        //    if (distance < minDistance)
-        //    {
-        //        minDistance = distance;
-        //        closestMine = (Mine)mine;
-        //    }
-        //}
 
         if (minDistance < SeeMineRange)
         {
             _targetMine = closestMine;
 
-            SetState(UnitState.WalkToPoint);
+            SetState(MinerState.WalkToPoint);
         }
     }
 
@@ -223,16 +187,27 @@ public class Miner : Unit
 
     private void LoseMine()
     {
-        _targetMine?.DecCountMiners();
+        if (CurrentState == MinerState.Mining)
+            _targetMine?.DecCountMiners();
 
         _targetMine = null;
     }
 
-    public override void OnDestroy()
+    protected override void Destroing()
     {
-        base.OnDestroy();
+        base.Destroing();
 
         LoseMine();
+    }
+
+    public override bool IsFree()
+    {
+        return CurrentState == MinerState.Mining;
+    }
+
+    protected override bool IsIdle()
+    {
+        return CurrentState == MinerState.Idle;
     }
 
 #if UNITY_EDITOR
