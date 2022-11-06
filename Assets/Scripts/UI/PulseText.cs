@@ -1,10 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
-
 
 public class PulseText : MonoBehaviour
 {
@@ -21,6 +17,8 @@ public class PulseText : MonoBehaviour
     public void StartEffect()
     {
         gameObject.SetActive(true);
+
+        StopAllCoroutines();
 
         StartCoroutine(ShowEffect());
     }
