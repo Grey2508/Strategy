@@ -1,9 +1,10 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Mine : Building
 {
+    [Header("Mine")]
+
     public GameObject[] MiningIndicators;
 
     public bool IsMined;
@@ -16,23 +17,18 @@ public class Mine : Building
     private int _countMiners = 0;
     private float _timer;
 
-    public override void Start()
+    protected override void Prepaire()
     {
-        base.Start();
+        base.Prepaire();
 
         for (int i = 0; i < MiningIndicators.Length; i++)
             MiningIndicators[i].SetActive(false);
     }
 
-    //public void ToggleIndicator(bool stage)
-    //{
-    //    MiningIndicator.SetActive(stage);
-    //}
-
     public void IncCountMiners()
     {
         if (++_countMiners > 0)
-            StartCoroutine("Mining");
+            StartCoroutine(Mining());
 
         if (_countMiners > MaxMiners)
             _countMiners = MaxMiners;
@@ -45,9 +41,11 @@ public class Mine : Building
         {
             _countMiners = 0;
 
-            //ToggleIndicator(false);
+            StopCoroutine(Mining());
 
-            StopCoroutine("Mining");
+            MiningIndicators[0].SetActive(false);
+
+            return;
         }
 
         MiningIndicators[_countMiners - 1].SetActive(false);
@@ -55,9 +53,7 @@ public class Mine : Building
 
     IEnumerator Mining()
     {
-        //ToggleIndicator(true);
-
-        for (; ; )
+        while(true)
         {
             _timer += Time.deltaTime;
 
