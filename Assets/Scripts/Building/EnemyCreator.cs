@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyCreator : MonoBehaviour
@@ -13,7 +11,7 @@ public class EnemyCreator : MonoBehaviour
     {
         _timer += Time.deltaTime;
 
-        if(_timer>Period)
+        if (_timer > Period)
         {
             Instantiate(EnemyPrefab, transform.position, Quaternion.identity);
             _timer = 0;
