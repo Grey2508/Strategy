@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
@@ -48,6 +45,7 @@ public class Enemy : MonoBehaviour
 
         SetState(EnemyState.WalkToBuilding);
     }
+
     void Update()
     {
         switch (CurrentEnemyState)
@@ -199,45 +197,14 @@ public class Enemy : MonoBehaviour
 
     public void FindClosestBuilding()
     {
-        //Building[] allBuildings = FindObjectsOfType<Building>();
-
-        //float minDistance = Mathf.Infinity;
         Building closestBuilding = Management.GetClosestBuilding<Building>(transform.position, out float minDistance);
-
-        //foreach (Building building in Management.AllBuildings)
-        //{
-        //    if (building.CurrentState == BuildingState.Placed)
-        //        continue;
-
-        //    float distance = Vector3.Distance(transform.position, building.transform.position);
-
-        //    if (distance < minDistance)
-        //    {
-        //        minDistance = distance;
-        //        closestBuilding = building;
-        //    }
-        //}
 
         TargetBuilding = closestBuilding;
     }
 
     public void FindClosestUnit()
     {
-        //Unit[] allUnits = FindObjectsOfType<Unit>();
-
-        //float minDistance = Mathf.Infinity;
         Unit closestUnit = Management.GetClosestUnit<Unit>(transform.position, out float minDistance);
-
-        //foreach (Unit unit in Management.AllUnits)
-        //{
-        //    float distance = Vector3.Distance(transform.position, unit.transform.position);
-
-        //    if (distance < minDistance)
-        //    {
-        //        minDistance = distance;
-        //        closestUnit = unit;
-        //    }
-        //}
 
         if (minDistance < FollowRange)
         {
@@ -248,8 +215,6 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damageValue)
     {
-        //FindClosestUnit();
-
         Health -= damageValue;
         _healthBar.SetHealth(Health, _maxHealth);
 
