@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,15 +21,6 @@ public class BuildingPlacer : MonoBehaviour
         BuildingDictionary.Clear();
 
         Management.InstallCreatedBuilding(this);
-
-        //if (Management.AllBuildings.Count > 0)
-        //    foreach (Building building in Management.AllBuildings)
-        //    {
-        //        int x = Mathf.RoundToInt(building.transform.position.x);
-        //        int z = Mathf.RoundToInt(building.transform.position.z);
-
-        //        InstallBuilding(x, z, building);
-        //    }
     }
 
     void Update()
