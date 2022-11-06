@@ -1,19 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
-public class Menu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class Menu : MonoBehaviour
 {
-    private SelectionState _prevSelectionState;
+    [SerializeField] Canvas MenuCanvas;
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public void ReloadGame()
     {
-        Management.IsOnMenu = true;
+        Time.timeScale = 1.0f;
+        SceneManager.LoadScene(0);
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public void ExitGame()
     {
-        Management.IsOnMenu = false;
+        Application.Quit();
+    }
+
+    public void ShowMenu()
+    {
+        Time.timeScale = 0.1f;
+
+        MenuCanvas.enabled = true;
+    }
+
+    public void HideMenu()
+    {
+        Time.timeScale = 1.0f;
+
+        MenuCanvas.enabled = false;
     }
 }
