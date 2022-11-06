@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SelectableObject : MonoBehaviour
@@ -13,7 +11,12 @@ public class SelectableObject : MonoBehaviour
     internal HealthBar _healthBar;
     internal int _maxHealth;
 
-    public virtual void Start()
+    private void Start()
+    {
+        Prepaire();
+    }
+
+    protected virtual void Prepaire()
     {
         SelectionIndicator.SetActive(false);
 
@@ -53,7 +56,12 @@ public class SelectableObject : MonoBehaviour
 
     }
 
-    public virtual void OnDestroy()
+    private void OnDestroy()
+    {
+        Destroing();
+    }
+
+    protected virtual void Destroing()
     {
         if (_healthBar)
             Destroy(_healthBar.gameObject);
