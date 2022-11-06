@@ -1,11 +1,19 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+public enum KnightState
+{
+    Idle,
+    WalkToPoint,
+    WalkToEnemy,
+    Attack,
+}
+
 public class Knight : Unit
 {
+    [Header("Knight")]
+    public KnightState CurrentState;
+
     public Enemy TargetEnemy;
 
     public float AttackRange = 1;
@@ -15,26 +23,27 @@ public class Knight : Unit
     public int Damage = 1;
     private float _timer;
 
-    public override void Start()
+    protected override void Prepaire()
     {
-        base.Start();
+        base.Prepaire();
     
-        SetState(UnitState.Idle);
+        SetState(KnightState.Idle);
     }
+
     void Update()
     {
-        switch (CurrentUnitState)
+        switch (CurrentState)
         {
-            case UnitState.Idle:
+            case KnightState.Idle:
                 KnightIdle();
                 break;
-            case UnitState.WalkToPoint:
+            case KnightState.WalkToPoint:
                 KnightWalkToPoint();
                 break;
-            case UnitState.WalkToEnemy:
+            case KnightState.WalkToEnemy:
                 KnightWalkToEnemy();
                 break;
-            case UnitState.Attack:
+            case KnightState.Attack:
                 KnightAttack();
                 break;
         }
@@ -53,17 +62,17 @@ public class Knight : Unit
         if (Vector3.Distance(transform.position, TargetPoint) >= 0.5f)
         {
             NavMeshAgent.SetDestination(TargetPointer.transform.position);
-            SetState(UnitState.WalkToPoint);
+            SetState(KnightState.WalkToPoint);
         }
         else
-            SetState(UnitState.Idle);
+            SetState(KnightState.Idle);
     }
 
     private void KnightWalkToEnemy()
     {
         if (!TargetEnemy)
         {
-            SetState(UnitState.WalkToPoint);
+            SetState(KnightState.WalkToPoint);
             return;
         }
 
@@ -71,10 +80,10 @@ public class Knight : Unit
         float distance = Vector3.Distance(transform.position, TargetEnemy.transform.position);
 
         if (distance > FollowRange)
-            SetState(UnitState.WalkToPoint);
+            SetState(KnightState.WalkToPoint);
         if (distance < AttackRange)
         {
-            SetState(UnitState.Attack);
+            SetState(KnightState.Attack);
         }
     }
 
@@ -82,7 +91,7 @@ public class Knight : Unit
     {
         if (!TargetEnemy)
         {
-            SetState(UnitState.WalkToPoint);
+            SetState(KnightState.WalkToPoint);
             return;
         }
 
@@ -92,7 +101,7 @@ public class Knight : Unit
 
         if (distance > AttackRange)
         {
-            SetState(UnitState.WalkToEnemy);
+            SetState(KnightState.WalkToEnemy);
         }
 
         _timer += Time.deltaTime;
@@ -104,53 +113,54 @@ public class Knight : Unit
 
     }
 
-    public void SetState(UnitState newState)
+    public void SetState(KnightState newState)
     {
-        CurrentUnitState = newState;
+        CurrentState = newState;
 
-        switch (CurrentUnitState)
+        switch (CurrentState)
         {
-            case UnitState.Idle:
+            case KnightState.Idle:
                 TargetPointer.SetActive(false);
                 break;
-            case UnitState.WalkToPoint:
+            case KnightState.WalkToPoint:
                 NavMeshAgent.stoppingDistance = 0.2f;
                 break;
-            case UnitState.WalkToEnemy:
+            case KnightState.WalkToEnemy:
                 break;
-            case UnitState.Attack:
+            case KnightState.Attack:
                 NavMeshAgent.stoppingDistance = AttackRange;
                 break;
         }
     }
 
+    protected override void SetState(int newState)
+    {
+        SetState((KnightState)newState);
+    }
+
     public bool FindClosestEnemy()
     {
-        //Enemy[] allEnemies = FindObjectsOfType<Enemy>();
-
-        //float minDistance = Mathf.Infinity;
         Enemy closestEnemy = Management.GetClosestEnemy(transform.position, out float minDistance);
-
-        //foreach (Enemy enemy in Management.AllEnemies)
-        //{
-        //    float distance = Vector3.Distance(transform.position, enemy.transform.position);
-
-        //    if (distance < minDistance)
-        //    {
-        //        minDistance = distance;
-        //        closestEnemy = enemy;
-        //    }
-        //}
 
         if (minDistance < FollowRange)
         {
             TargetEnemy = closestEnemy;
-            SetState(UnitState.WalkToEnemy);
+            SetState(KnightState.WalkToEnemy);
 
             return true;
         }
 
         return false;
+    }
+
+    protected override bool IsIdle()
+    {
+        return CurrentState == KnightState.Idle;
+    }
+
+    public override bool IsFree()
+    {
+        return CurrentState != KnightState.WalkToEnemy && CurrentState != KnightState.Attack;
     }
 
 #if UNITY_EDITOR
