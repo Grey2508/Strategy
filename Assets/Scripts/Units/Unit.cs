@@ -1,31 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 public enum UnitState
 {
     Idle,
-    WalkToPoint,
-    WalkToEnemy,
-    Attack,
-    Mining,
-    Escape
+    WalkToPoint
 }
 
 public class Unit : SelectableObject
 {
+    [Header("Unit")]
     public NavMeshAgent NavMeshAgent;
     public int Price = 5;
 
     public GameObject TargetPointer;
     public Vector3 TargetPoint;
 
-    public UnitState CurrentUnitState;
-
-    public override void Start()
+    protected override void Prepaire()
     {
-        base.Start();
+        base.Prepaire();
         TargetPointer.transform.parent = null;
         TargetPoint = transform.position;
 
@@ -33,12 +26,13 @@ public class Unit : SelectableObject
 
         Management.AddUnit(this);
     }
+
     public override void WhenClickOnGround(Vector3 point)
     {
         base.WhenClickOnGround(point);
 
         NavMeshAgent.SetDestination(point);
-        CurrentUnitState = UnitState.WalkToPoint;
+        SetState((int)UnitState.WalkToPoint);
 
         TargetPoint = point;
 
@@ -57,9 +51,9 @@ public class Unit : SelectableObject
         }
     }
 
-    public override void OnDestroy()
+    protected override void Destroing()
     {
-        base.OnDestroy();
+        base.Destroing();
 
         FindObjectOfType<Management>()?.UnSelect(this);
 
@@ -73,7 +67,7 @@ public class Unit : SelectableObject
     {
         base.Select();
 
-        if (CurrentUnitState != UnitState.Idle)
+        if(IsIdle())
             TargetPointer.SetActive(true);
     }
 
@@ -82,5 +76,20 @@ public class Unit : SelectableObject
         base.Unselect();
 
         TargetPointer.SetActive(false);
+    }
+    
+    public virtual bool IsFree()
+    {
+        return false;
+    }
+
+    protected virtual bool IsIdle()
+    {
+        return false;
+    }
+
+    protected virtual void SetState (int newState)
+    {
+
     }
 }
