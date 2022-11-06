@@ -22,15 +22,23 @@ public class Management : MonoBehaviour
     public static SelectionState CurrentSelectionState = SelectionState.Other;
     public static bool IsOnMenu = false;
 
-    public Camera MainCamera;
-    public SelectableObject Howered;
+    [SerializeField] Camera MainCamera;
+    [SerializeField] SelectableObject Howered;
 
-    public List<SelectableObject> ListOfSelected;
+    [SerializeField] List<SelectableObject> ListOfSelected;
 
-    public Image FrameImage;
+    [SerializeField] Image FrameImage;
     private Vector2 _frameStart;
     private Vector2 _frameEnd;
     private bool _isFrameActive;
+
+    [SerializeField] GameOver GameOverScreen;
+    private static GameOver StaticGameOverScreen;
+
+    private void Start()
+    {
+        StaticGameOverScreen = GameOverScreen;
+    }
 
     void Update()
     {
@@ -250,7 +258,10 @@ public class Management : MonoBehaviour
 
     private static void GameOver()
     {
-        Debug.Log("gameOver");
+        if (StaticGameOverScreen == null)
+            return;
+
+        StaticGameOverScreen.StartAnimation();
     }
 
     public static T GetClosestBuilding<T>(Vector3 position, out float Distance) where T : Building
