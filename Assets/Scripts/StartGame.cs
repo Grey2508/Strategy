@@ -4,18 +4,25 @@ using UnityEngine;
 
 public class StartGame : MonoBehaviour
 {
-    public List<EnemyCreator> EnemyCreators;
+    public List<GameObject> EnemyCreatorsGroups;
     public float TimeToActiveEnemyCreators = 30;
 
-    // Start is called before the first frame update
+    public PulseText AlarmText;
+
+    private int _index = 0;
+
     void Start()
     {
-        Invoke(nameof(ActiveEnemyCreators), TimeToActiveEnemyCreators);
+        InvokeRepeating(nameof(ActiveEnemyCreators), TimeToActiveEnemyCreators, TimeToActiveEnemyCreators);
     }
 
     void ActiveEnemyCreators()
     {
-        for (int i = 0; i < EnemyCreators.Count; i++)
-            EnemyCreators[i].gameObject.SetActive(true);
+        AlarmText.StartEffect();
+
+        EnemyCreatorsGroups[_index++].SetActive(true);
+
+        if (_index >= EnemyCreatorsGroups.Count)
+            CancelInvoke(nameof(ActiveEnemyCreators));
     }
 }
