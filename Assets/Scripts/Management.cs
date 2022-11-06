@@ -1,10 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static UnityEngine.UI.CanvasScaler;
 
 public enum SelectionState
 {
@@ -49,9 +46,6 @@ public class Management : MonoBehaviour
         TrySelect();
 
         ClickOnGround(hit);
-
-        //if (Input.GetMouseButtonDown(1))
-        //    UnselectAll();
 
         FrameSelect();
 
@@ -167,7 +161,6 @@ public class Management : MonoBehaviour
 
                 UnselectAll();
 
-                //Unit[] allUnits = FindObjectsOfType<Unit>();
                 foreach (Unit unit in AllUnits)
                 {
                     Vector2 screenPosition = MainCamera.WorldToScreenPoint(unit.transform.position);
@@ -298,6 +291,9 @@ public class Management : MonoBehaviour
         foreach (Unit unit in AllUnits)
         {
             if (!(unit is T))
+                continue;
+
+            if (!unit.IsFree())
                 continue;
 
             float distance = Vector3.Distance(position, unit.transform.position);
