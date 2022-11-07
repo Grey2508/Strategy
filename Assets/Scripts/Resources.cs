@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class Resources : MonoBehaviour
 {
-    private static int _gold = 50;
+    private static int _gold;
     public static int Gold
     {
         get
@@ -18,10 +18,11 @@ public class Resources : MonoBehaviour
     }
 
     private static Text _goldCountText;
+    public int StartGold = 50;
 
     private void Start()
     {
         _goldCountText = FindObjectOfType<Gold>().GetText();
-        _goldCountText.text = Gold.ToString();
+        Gold = StartGold;
     }
 }
