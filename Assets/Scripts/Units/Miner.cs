@@ -144,6 +144,9 @@ public class Miner : Unit
         if (minDistance < FearRange)
         {
             _scaredEnemy = closestEnemy;
+            
+            LoseMine();
+
             SetState(MinerState.Escape);
 
             return true;
@@ -180,9 +183,11 @@ public class Miner : Unit
 
     public override void WhenClickOnGround(Vector3 point)
     {
-        base.WhenClickOnGround(point);
-
         LoseMine();
+
+        base.WhenClickOnGround(point);
+        
+        SetState(MinerState.WalkToPoint);
     }
 
     private void LoseMine()
