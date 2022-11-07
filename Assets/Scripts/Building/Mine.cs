@@ -42,13 +42,9 @@ public class Mine : Building
             _countMiners = 0;
 
             StopCoroutine(Mining());
-
-            MiningIndicators[0].SetActive(false);
-
-            return;
         }
 
-        MiningIndicators[_countMiners - 1].SetActive(false);
+        MiningIndicators[_countMiners].SetActive(false);
     }
 
     IEnumerator Mining()
